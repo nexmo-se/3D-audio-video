@@ -1,7 +1,7 @@
 var roomWidth = 7;
 var roomHeight = 3;
 var roomDepth = 7;
-var dimensionFactor = 0.1;
+var dimensionFactor = 1;
 var layoutWidth = 0;
 var layoutHeight = 0;
 

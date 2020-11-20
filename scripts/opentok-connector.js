@@ -12,7 +12,7 @@ var apiKey = "38169452";*/
 
 var apiKey="46183452";
 var sessionId = "2_MX40NjE4MzQ1Mn5-MTU2NDgyMzMxNDIxMX5KaVlsM1MvdmF0dU1XOFBCalM0T09Ic1Z-fg";
-var token ="T1==cGFydG5lcl9pZD00NjE4MzQ1MiZzaWc9MTRmM2FjZmJjNzlkMzRjMmFhN2IwZmNkMDQ0M2I0NWEwYmY1YWYxOTpzZXNzaW9uX2lkPTJfTVg0ME5qRTRNelExTW41LU1UVTJORGd5TXpNeE5ESXhNWDVLYVZsc00xTXZkbUYwZFUxWE9GQkNhbE0wVDA5SWMxWi1mZyZjcmVhdGVfdGltZT0xNjA1NzU3NzAzJnJvbGU9cHVibGlzaGVyJm5vbmNlPTE2MDU3NTc3MDMuNzA3MzYwMjQ1NjU2MQ==";
+var token ="T1==cGFydG5lcl9pZD00NjE4MzQ1MiZzaWc9YmUzYWMxNzZkODRkMGQ0NjQxMTMzODNhZjc3MjE0NjRjZDYyZmRlMjpzZXNzaW9uX2lkPTJfTVg0ME5qRTRNelExTW41LU1UVTJORGd5TXpNeE5ESXhNWDVLYVZsc00xTXZkbUYwZFUxWE9GQkNhbE0wVDA5SWMxWi1mZyZjcmVhdGVfdGltZT0xNjA1ODY3OTgxJnJvbGU9cHVibGlzaGVyJm5vbmNlPTE2MDU4Njc5ODEuNzgyMjU5NDgwOTU2NQ==";
 
 function initializeVideoSession() {
     OTSession = OT.initSession(apiKey, sessionId);
@@ -52,7 +52,15 @@ function initializeVideoSession() {
 }
 
 function addSubcriberToDom(streamId,element) {
-    var tempHtml = '<div id="' + streamId + '" class="video-tile"><div id="' + streamId + '-header" class="video-header subheader"><img src="images/move.png" style="width:20px;height:20px;float:right"/></div></div>';
+    var x = Common.randomIntFromInterval(100,500);
+    var z = Common.randomIntFromInterval(100,500);
+    
+    let coordZ = ((z - (Common.layoutHeight / 2)) / (Common.layoutHeight / 2)) * (Common.roomDepth/2);
+    let coordX = ((x - (Common.layoutWidth / 2)) / (Common.layoutWidth / 2)) * (Common.roomWidth/2);
+    coordX = Math.round(coordX*Common.dimensionFactor*100)/100;
+    coordZ = Math.round(coordZ*Common.dimensionFactor*100)/100;
+    
+    var tempHtml = '<div id="' + streamId + '" class="video-tile" style="top:'+z+'px;left:'+x+'px"><div id="' + streamId + '-header" class="video-header subheader"><img src="images/move.png" style="width:20px;height:20px;float:right"/></div></div>';
     document.getElementById('layout').insertAdjacentHTML('beforeend', tempHtml);
     element.width=320;
     element.height=240;
@@ -64,8 +72,8 @@ function addSubcriberToDom(streamId,element) {
  
     if(!ResonanceX.sourceExists()){
       /* we are adding this subscriber for the first time, so connect to resonance */
-      console.log("Adding source:"+streamId);
-      ResonanceX.connectVideoToResonanceAudio(streamId,element,0,0,0);
+      console.log("Adding source:"+streamId+" at top:"+z+" left:"+x+" and coordX:"+coordX+" coordZ:"+coordZ);
+      ResonanceX.connectVideoToResonanceAudio(streamId,element,coordX,0,coordZ);
     }
 }
 
@@ -97,9 +105,7 @@ function startPublishing() {
       publisher = OT.initPublisher('publisher', {
           insertMode: 'append',
           width: '150px',
-          height: '120px',
-          disableAudioProcessing: true,
-          audioBitrate: 64000
+          height: '120px'
       }, (err) => {
           if (err) {
               handleError(err);

@@ -5,7 +5,7 @@
 <body>
 	<div class="grid-container">
 	<div class="topbar">
-        <label class="mode-selector">Stereo <input id="stereomode" name="audiomode" type="radio"/> &nbsp; &nbsp; &nbsp; &nbsp;Spatial <input id="spatialmode" name="audiomode" type="radio" checked/></label>
+        <label class="mode-selector">Audio Mode: &nbsp;&nbsp;<input id="nonemode" name="audiomode" type="radio"/>  None &nbsp; &nbsp; &nbsp; &nbsp; <input id="stereomode" name="audiomode" type="radio"/>Stereo  &nbsp; &nbsp; &nbsp; &nbsp;<input id="spatialmode" name="audiomode" type="radio" checked/>Spatial </label>
 		<label class="switch"><input type="checkbox" id="togBtn"> <div class="slider round"></div> </label>
 	</div>
   <div id="3dcanvas" class="layout" style="visibility: hidden">
@@ -18,15 +18,20 @@
         </div>
     </div>
     <div id="music" class="video-tile" style="width:170px;height:170px;top:100px;left:100px">
-        <div id="music-header" class="video-header musicheader" style="width:150px"><img src="images/move.png" style="width:20px;height:20px;float:right"/></div>
-         <div id="volumediv">
-         Volume <input type="range" id="volume" name="volume" min="0" max="1" value="0.5" step="0.1"><br/>
-          <button id="playpausebtn">Play</button><br/>
-          <img src="images/music.png" style="width:60px;height:60px"/>
+        <div id="music-header" class="video-header musicheader" style="width:150px">
+            <img src="images/move.png" style="width:20px;height:20px;float:right"/>
+        </div>
+        <div id="volumediv">
+            Volume <input type="range" id="volume" name="volume" min="0" max="1" value="0.5" step="0.1"><br/>
+            <button id="playpausebtn">Play</button><br/>
+            <img src="images/music.png" style="width:60px;height:60px"/>
         </div>
     </div>
-	</div>
-	<div class="bottombar"></div>
+	<div class="bottombar">
+        <label>
+            <button style="margin-top: 10px" id="callbtn"><img id="callcontrol" src="images/call.png" style="width:50px;height: 50px;"/></button>
+        </label>
+    </div>
 </div>
 </body>
 <script src="https://static.opentok.com/v2/js/opentok.js"></script>

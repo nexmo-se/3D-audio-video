@@ -16,6 +16,7 @@ function mainInit(){
   document.getElementById("volume").onchange = changeMusicVolume;
   document.getElementById("stereomode").onclick = changeAudioMode;
   document.getElementById("spatialmode").onclick = changeAudioMode;
+  document.getElementById("nonemode").onclick = changeAudioMode;
   window.addEventListener('resize', onWindowResize, false);
   document.body.addEventListener( 'click', function () {
     if(Common.is3DMode()){
@@ -45,10 +46,16 @@ function changeAudioMode(){
         console.log("enabling spatial mode");
         ResonanceX.changeMode(ResonanceX.MODE_SPATIAL);
     }
+    else if(document.getElementById("nonemode").checked){
+        console.log("enabling none mode");
+        ResonanceX.changeMode(ResonanceX.MODE_NONE);
+    }
 }
 function switchLayout() {
   if(Common.is3DMode()){
     ThreeX.unlockPointerControls();
+    /* re-enable stereo mode */
+    document.getElementById("stereomode").disabled=false;
     Common.hide3DLayout();
     Common.show2DLayout();
     /* if we are currently in 3D mode, remove subscribers from the scene and stop animation loop */
@@ -58,6 +65,10 @@ function switchLayout() {
     OpentokX.addSubscribersToDom();
   }
   else{
+    /* when going from 2D to 3D, disable stereo mode */
+    ResonanceX.changeMode(ResonanceX.MODE_SPATIAL);
+    document.getElementById("spatialmode").checked=true;
+    document.getElementById("stereomode").disabled=true;
     Common.hide2DLayout();
     Common.show3DLayout();
     /* if we are currently in 2D mode, remove subscribers from DOM, stop playing music */

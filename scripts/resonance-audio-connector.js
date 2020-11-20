@@ -6,6 +6,7 @@ let resonanceGain = undefined;
 var resonanceSources = {};
 var pannerSources = {};
 var pannerGains = {};
+var noneGains = {};
 
 let MODE_NONE=0;
 let MODE_STEREO=1;
@@ -69,13 +70,25 @@ function changeMode(mode){
     if(mode == MODE_SPATIAL){
         resonanceGain.gain.value=1;
         setStereoPannerValue(0);
+        setNoneGainValue(0);
     }
     else if(mode == MODE_STEREO){
         resonanceGain.gain.value=0;
         setStereoPannerValue(1);
+        setNoneGainValue(0);
+    }
+    else if(mode == MODE_NONE){
+        resonanceGain.gain.value=0;
+        setStereoPannerValue(0);
+        setNoneGainValue(1);
     }
 }
 
+function setNoneGainValue(val){
+    for (var streamId in noneGains) {
+        noneGains[streamId].gain.value=val;
+    }
+}
 function setStereoPannerValue(val){
     //console.log(pannerSources);
     for (var streamId in pannerGains) {
@@ -98,6 +111,12 @@ function connectVideoToResonanceAudio(streamId,element,x,y,z) {
     pannerGain.gain.value=0;
     pannerSources[streamId]=pannerNode;
     pannerGains[streamId]=pannerGain;
+    
+    let noneGain = audioContext.createGain();
+    audioElementSource.connect(noneGain);
+    noneGain.connect(audioContext.destination);
+    noneGains[streamId] = noneGain;
+    noneGain.gain.value=0;
 }
 
 function setPannerStereoLevel(streamId,level){
@@ -125,6 +144,12 @@ function addMusicSource(elem){
     pannerSources["music"]=pannerNode;
     pannerGain.gain.value=0;
     pannerGains["music"] = pannerGain;
+    
+    let noneGain = audioContext.createGain();
+    audioElementSource.connect(noneGain);
+    noneGain.connect(audioContext.destination);
+    noneGains["music"] = noneGain;
+    noneGain.gain.value=0;
 }
 
 function setListenerOrientation(x,y,z,ux,uy,uz){
