@@ -41,7 +41,7 @@ function init3D(){
 
   var hlight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
   threeScene.add( hlight );
-  controls = new PointerLockControls( camera, document.body );
+  controls = new PointerLockControls( camera, document.getElementById("3dcanvas") );
   controls.minPolarAngle = 0;
   controls.maxPolarAngle = Math.PI / 2;
   controls.addEventListener('change', function(){controlsDirectionChanged();});
@@ -62,7 +62,7 @@ function animate() {
     setInterval(function(){
       const time = performance.now();
       if(Common.is3DMode()){
-        const factor = 0.05;
+        const factor = 0.01;
         const wallBuffer = 0.95;
         const delta = ( time - prevTime ) / 1000;
         velocity.x -= velocity.x * 10.0 * delta;
@@ -193,6 +193,24 @@ function create3DRoom(){
 
   addCeiling();
   addFlooring();
+  addLogos();
+}
+
+function addLogos(){
+    var loader = new THREE.TextureLoader();
+    loader.load('images/logos.png', function (texture) {
+     // texture.wrapS = texture.wrapY = THREE.RepeatWrapping
+      //texture.offset.set( 0, 0 );
+      //texture.repeat.set( 1, 1 );
+
+      var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( Common.roomWidth/3, Common.roomHeight/6, 0.05 ), new THREE.MeshBasicMaterial({map: texture}) );
+      mesh.position.set( 0, 0, (-1*Common.roomDepth/2)+0.1 );
+      //mesh.rotation.set( - Math.PI / 2, 0, 0 );
+      threeScene.add( mesh );
+    },undefined, function(error){
+      
+    });
+  
 }
 
 function addFlooring(){

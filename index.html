@@ -3,14 +3,17 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <section id="loading-screen">
+        <div id="loader"></div>
+    </section>
 	<div class="grid-container">
 	<div class="topbar">
         <label class="mode-selector">Audio Mode: &nbsp;&nbsp;<input id="nonemode" name="audiomode" type="radio"/>  None &nbsp; &nbsp; &nbsp; &nbsp; <input id="stereomode" name="audiomode" type="radio"/>Stereo  &nbsp; &nbsp; &nbsp; &nbsp;<input id="spatialmode" name="audiomode" type="radio" checked/>Spatial </label>
 		<label class="switch"><input type="checkbox" id="togBtn"> <div class="slider round"></div> </label>
 	</div>
-  <div id="3dcanvas" class="layout" style="visibility: hidden">
-  </div>
-	<div class="layout" id="layout">
+    <div id="3dcanvas" class="layout" style="visibility: hidden">
+    </div>
+	<div class="layout audiobg" id="layout">
 		<div id="publisher" class="video-tile" style="width:150px;height:150px">
             <div id="publisher-header" class="pubheader video-header" style="width:130px">
                 You<img src="images/move.png" style="width:20px;height:20px;float:right"/>
@@ -29,8 +32,13 @@
     </div>
 	<div class="bottombar">
         <label>
-            <button style="margin-top: 10px" id="callbtn"><img id="callcontrol" src="images/call.png" style="width:50px;height: 50px;"/></button>
+            <button style="margin-top: 10px" id="callBtn"><img id="callcontrol" src="images/call.png" style="width:50px;height: 50px;"/></button>
         </label>
+    </div>
+    <div id="controls" style="position: absolute;right: 0px;top:300px;font-size:11px;visibility: hidden">
+        <label><img src="images/arrowkeys.png" style="height:100px"/> <br/>Use arrows keys to move&nbsp;</label><br/>
+         <label><img src="images/mouse-icon.png" style="height:60px;margin-left:20px"/> <br/>Use mouse to look around&nbsp;</label><br/>
+        <label><img src="images/escape-key.png" style="height:60px;margin-left:20px"/> <br/>ESC key to release mouse&nbsp;</label>
     </div>
 </div>
 </body>

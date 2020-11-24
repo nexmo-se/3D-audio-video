@@ -5,10 +5,15 @@ import * as Common from './common.js';
 
 var isMusicPlaying = false;
 let musicElement = undefined;
+var userid='';
+
+function getQueryStringValue (key) {  
+  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+}  
 
 
 function mainInit(){
-  //alert("x");
+  userid = getQueryStringValue("u");
   document.getElementById("publisher").style.top=((document.getElementById("layout").clientHeight/2) - 75)+"px";
   document.getElementById("publisher").style.left=((document.getElementById("layout").clientWidth/2) - 75)+"px";
   document.getElementById("playpausebtn").onclick = playPauseMusic;
@@ -17,6 +22,7 @@ function mainInit(){
   document.getElementById("stereomode").onclick = changeAudioMode;
   document.getElementById("spatialmode").onclick = changeAudioMode;
   document.getElementById("nonemode").onclick = changeAudioMode;
+  document.getElementById("callBtn").onclick = callBtnClicked;
   window.addEventListener('resize', onWindowResize, false);
   document.body.addEventListener( 'click', function () {
     if(Common.is3DMode()){
@@ -25,16 +31,37 @@ function mainInit(){
   });
   ResonanceX.initResonanceAudio();
   addMusicElement();
-  OpentokX.initializeVideoSession();
+  OpentokX.setConnectionCallback(videoCallBack);
   ThreeX.init3D();
   Common.dragElement(document.getElementById("publisher"), document.getElementById("publisher-header"),function(elem){
     ResonanceX.updateSource2DPosition(elem);
   });
+  /* remove loading screen */
+  var loader = document.getElementById("loading-screen");
+  loader.remove();
+}
+
+function videoCallBack(status){
+    document.getElementById("callBtn").disabled = false;
+    if(status == OpentokX.STATUS_CONNECTED){
+        document.getElementById("callcontrol").src="images/hangup.png";
+    }
+    else if(status == OpentokX.STATUS_DISCONNECTED){
+        document.getElementById("callcontrol").src="images/call.png";
+    }
+    else if(status == OpentokX.STATUS_ERROR){
+        
+    }
 }
 
 function onWindowResize() {
     Common.populateLayoutDimensions();
     ThreeX.setCanvasSize()
+}
+
+function callBtnClicked(){
+    document.getElementById("callBtn").disabled = true;
+    OpentokX.connectOrDisconnect(userid);
 }
 
 function changeAudioMode(){

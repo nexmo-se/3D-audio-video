@@ -6,23 +6,68 @@ var OTSession = undefined;
 var publisher;
 var subscriberVideoElems = {};
 var subscribers = {};
+var isConnected = false;
+var callback = undefined;
 /*var token = "T1==cGFydG5lcl9pZD0zODE2OTQ1MiZzaWc9ZjcxMWY3NjlkM2NmNjRjNzFhMDE5MWE3ZDZmMWZjNjNjMmZjMGY1OTpzZXNzaW9uX2lkPTFfTVg0ek9ERTJPVFExTW41LU1UWXdOVFl3TWpnd056Y3dPWDV4ZDFJd2JEaGxUMWMyVkM5MEt6aE5XamwyUm5sRUswbC1mZyZjcmVhdGVfdGltZT0xNjA1NjAyODA4Jm5vbmNlPTAuNjEwODQ5NzkwNzAzNjU2NyZyb2xlPW1vZGVyYXRvciZleHBpcmVfdGltZT0xNjA2MjA3NjA4JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
 var sessionId = "1_MX4zODE2OTQ1Mn5-MTYwNTYwMjgwNzcwOX5xd1IwbDhlT1c2VC90KzhNWjl2RnlEK0l-fg";
 var apiKey = "38169452";*/
 
 var apiKey="46183452";
 var sessionId = "2_MX40NjE4MzQ1Mn5-MTU2NDgyMzMxNDIxMX5KaVlsM1MvdmF0dU1XOFBCalM0T09Ic1Z-fg";
-var token ="T1==cGFydG5lcl9pZD00NjE4MzQ1MiZzaWc9YmUzYWMxNzZkODRkMGQ0NjQxMTMzODNhZjc3MjE0NjRjZDYyZmRlMjpzZXNzaW9uX2lkPTJfTVg0ME5qRTRNelExTW41LU1UVTJORGd5TXpNeE5ESXhNWDVLYVZsc00xTXZkbUYwZFUxWE9GQkNhbE0wVDA5SWMxWi1mZyZjcmVhdGVfdGltZT0xNjA1ODY3OTgxJnJvbGU9cHVibGlzaGVyJm5vbmNlPTE2MDU4Njc5ODEuNzgyMjU5NDgwOTU2NQ==";
+var token ="T1==cGFydG5lcl9pZD00NjE4MzQ1MiZzaWc9YWE0NTQ0MzI4ZjllMzY1ZmY5YWU5ZDFmODU1ZjEyZWU0ZDI5Y2M1MjpzZXNzaW9uX2lkPTJfTVg0ME5qRTRNelExTW41LU1UVTJORGd5TXpNeE5ESXhNWDVLYVZsc00xTXZkbUYwZFUxWE9GQkNhbE0wVDA5SWMxWi1mZyZjcmVhdGVfdGltZT0xNjA2MTEyNTg3JnJvbGU9cHVibGlzaGVyJm5vbmNlPTE2MDYxMTI1ODcuMDYyNDE0NDEyMzI4MjM=";
 
+var STATUS_DISCONNECTED=0;
+var STATUS_CONNECTED=1;
+var STATUS_ERROR=2;
+
+function setConnectionCallback(func){
+    callback = func;
+}
+function connectOrDisconnect(userid){
+    if(isConnected){
+        isConnected = false;
+        OTSession.disconnect();
+        if(callback)
+            callback(STATUS_DISCONNECTED);
+    }
+    else{
+        getSessionInfo(userid);
+    }
+}
+
+function getSessionInfo(userid){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var info = JSON.parse(xhttp.responseText);
+            try{
+                apiKey = info.apiKey;
+                token = info.token;
+                sessionId = info.sessionId;
+                initializeVideoSession()
+            }
+            catch(error){
+                alert("Error parsing session information");
+            }
+        }
+    };
+    xhttp.open("GET", "/token?u="+userid, true);
+    xhttp.send();
+}
+
+function getStatus(){
+    return isConnected;
+}
 function initializeVideoSession() {
     OTSession = OT.initSession(apiKey, sessionId);
     OTSession.connect(token, function(error) {
         if (error) {
             handleError(error);
-            return false;
+            if(callback)
+                callback(STATUS_ERROR);
         } else {
             console.log("session connected");
-           startPublishing();
+            startPublishing();
         }
     });
     OTSession.on('streamCreated', function(event) {
@@ -43,12 +88,15 @@ function initializeVideoSession() {
         });
 
     });
-
+    OTSession.on('disconnected', function(event) {
+        isConnected = false;
+        if(callback)
+            callback(STATUS_DISCONNECTED);
+    });
+    
     OTSession.on('streamDestroyed', function(event) {
         removeSubscriber(event);
     });
-
-    return true;
 }
 
 function addSubcriberToDom(streamId,element) {
@@ -109,12 +157,21 @@ function startPublishing() {
       }, (err) => {
           if (err) {
               handleError(err);
+              OTSession.disconnect();
+              if(callback)
+                callback(STATUS_ERROR);
           } else {
               OTSession.publish(publisher, function(error) {
                   if (error) {
                       handleError(error);
+                      OTSession.disconnect();
+                      if(callback)
+                        callback(STATUS_ERROR);
                   } else {
                       console.log('Publishing a stream.');
+                      isConnected = true;
+                      if(callback)
+                        callback(STATUS_CONNECTED);
                   }
               });
           }
@@ -135,4 +192,4 @@ function getSubscriberElemList(){
 	return subscriberVideoElems;
 }
 
-export {initializeVideoSession,addSubscribersToDom,removeSubscribersFromDom,getSubscriberList,getSubscriberElemList};
+export {initializeVideoSession,addSubscribersToDom,removeSubscribersFromDom,getSubscriberList,getSubscriberElemList,connectOrDisconnect,getStatus,STATUS_CONNECTED,STATUS_DISCONNECTED,STATUS_ERROR,setConnectionCallback,callback};

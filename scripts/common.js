@@ -26,6 +26,7 @@ function hide2DLayout(){
 }
 function hide3DLayout(){
     document.getElementById("3dcanvas").style.visibility="hidden";
+    document.getElementById("controls").style.visibility="hidden";
 }
 function show2DLayout(){
     document.getElementById("layout").style.visibility="visible";
@@ -33,6 +34,7 @@ function show2DLayout(){
 }
 function show3DLayout(){
     document.getElementById("3dcanvas").style.visibility="visible";
+    document.getElementById("controls").style.visibility="visible";
 }
 function populateLayoutDimensions() {
     var layout = document.getElementById("layout");

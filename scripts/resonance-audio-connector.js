@@ -97,7 +97,7 @@ function setStereoPannerValue(val){
 }
 
 function connectVideoToResonanceAudio(streamId,element,x,y,z) {
-    let audioElementSource = audioContext.createMediaStreamSource(element.captureStream());
+    let audioElementSource = audioContext.createMediaStreamSource(element.captureStream ? element.captureStream():element.mozCaptureStream());
     let source = resonanceAudioScene.createSource();
     audioElementSource.connect(source.input);
     source.setPosition(x, y, x);
@@ -121,7 +121,7 @@ function connectVideoToResonanceAudio(streamId,element,x,y,z) {
 
 function setPannerStereoLevel(streamId,level){
     pannerSources[streamId].pan.setValueAtTime(level, audioContext.currentTime);
-    console.log("Level="+level);
+    //console.log("Level="+level);
 }
 function setSourcePosition(streamId,x,y,z){
 	resonanceSources[streamId].setPosition(x,y,z);
