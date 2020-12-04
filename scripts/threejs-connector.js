@@ -15,6 +15,12 @@ let moveBackward = false;
 let moveLeft = false;
 let moveRight = false;
 let canJump = false;
+let positionTimer = undefined;
+
+var tweens ={};
+var tweenGroups = {};
+var curPos = {x:0,y:0,z:0};
+var lastPos = {x:0,y:0,z:0};
 
 let prevTime = performance.now();
 const velocity = new THREE.Vector3();
@@ -34,7 +40,7 @@ function init3D(){
   canvasDiv.appendChild( renderer.domElement );
 
   threeScene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 75, canvasDiv.clientWidth / canvasDiv.clientHeight, 0.01, 20 );
+  camera = new THREE.PerspectiveCamera( 55, canvasDiv.clientWidth / canvasDiv.clientHeight, 0.01, 20 );
   camera.position.set(0,-0.5,0);
   //camera.lookAt(0,0,0);
   threeScene.add( camera );
@@ -51,6 +57,7 @@ function init3D(){
   create3DRoom();
   bindKeys();
   animate();
+  startPositionTrasmitter();
 }
 
 function controlsDirectionChanged(){
@@ -58,11 +65,24 @@ function controlsDirectionChanged(){
   ResonanceX.setListenerOrientation(-1*controlsDirection.x,-1*controlsDirection.y,-1*controlsDirection.z,-1*camera.up.x,-1*camera.up.y,-1*camera.up.z);
 }
 
+function startPositionTrasmitter(){
+    positionTimer = setInterval(function(){
+        /* check if position has changed */
+        //console.log(lastPos);
+        //console.log(curPos);
+        if(lastPos.x != curPos.x || lastPos.y != curPos.y || lastPos.z != curPos.z){
+            /* transmit new position to remote participants*/
+            OpentokX.sendPositionUpdate(curPos);
+            Object.assign(lastPos,curPos);
+        }
+        
+    },1000);
+}
 function animate() {
     setInterval(function(){
       const time = performance.now();
       if(Common.is3DMode()){
-        const factor = 0.01;
+        const factor = 0.03;
         const wallBuffer = 0.95;
         const delta = ( time - prevTime ) / 1000;
         velocity.x -= velocity.x * 10.0 * delta;
@@ -90,7 +110,14 @@ function animate() {
            controls.moveRight(-1*xMovement);
            controls.moveForward(-1*zMovement);
         }
+        else{
+            Object.assign(curPos,camera.position);
+        }
         ResonanceX.setListenerPosition(camera.position.x,camera.position.y,camera.position.z);
+        for(var id in tweenGroups){
+          console.log("updating tween:"+id);
+          tweenGroups[id].update();
+        }
         renderer.render( threeScene, camera );
       }
       prevTime = time;
@@ -104,7 +131,7 @@ function bindKeys(){
       case 38: // up
       case 87: // w
         moveForward = true;
-        console.log(camera.position);
+        //console.log(camera.position);
         break;
       case 37: // left
       case 65: // a
@@ -262,15 +289,15 @@ function create3DSubscriber(streamId, element){
     var video1Texture  = new THREE.VideoTexture(element/*video1*/ );
     video1Texture.wrapS = THREE.RepeatWrapping;
     video1Texture.wrapT = THREE.RepeatWrapping;
-    video1Texture.repeat.set(-1, 1);
+    video1Texture.repeat.set(1, 1);
     video1Texture.offset.set(1, 0);
 
     var vidMesh = new THREE.Mesh(subscriber3d, new THREE.MeshBasicMaterial({map: video1Texture}));
     vidMesh.name = streamId;
 
-    var x = Common.randomIntFromInterval(-10*(Common.roomWidth-3)/2,10*(Common.roomWidth-3)/2)/10;
+    var x = 0;//Common.randomIntFromInterval(-10*(Common.roomWidth-3)/2,10*(Common.roomWidth-3)/2)/10;
   	var y = -0.5;//randomIntFromInterval(-10*(roomHeight-1.5)/2,10*(roomHeight-1.5)/2)/10;
-  	var z = Common.randomIntFromInterval(-10*(Common.roomDepth-3)/2,10*(Common.roomDepth-3)/2)/10;
+  	var z = 0;//Common.randomIntFromInterval(-10*(Common.roomDepth-3)/2,10*(Common.roomDepth-3)/2)/10;
 
     if(ResonanceX.sourceExists(streamId)){
         /* this stream was already added to resonance, so just change its position*/
@@ -284,6 +311,29 @@ function create3DSubscriber(streamId, element){
         threeScene.add(vidMesh);
     }
 
+}
+
+function moveSubscriberToPos(id,pos){
+     const object = threeScene.getObjectByName(id);
+     if(tweenGroups[id] ==undefined){
+         tweenGroups[id] = new TWEEN.Group();
+     }
+     else{
+         //tweenGroups[id].removeAll();
+     }
+     //object.position.set(pos.x,pos.y,pos.z);
+    var tweenVector3 = new TWEEN.Tween(object.position,tweenGroups[id])
+        .to({ x: pos.x, y: pos.y, z: pos.z, }, 1000)
+        .easing(TWEEN.Easing.Quadratic.InOut)
+        .onUpdate(function(d) {
+            
+         })
+        .onComplete(function(){
+          
+        });
+    // start the tween
+    tweenVector3.start();
+    ResonanceX.setSourcePosition(id,pos.x,pos.y,pos.z);
 }
 
 function add3DSubscribersToScene(){
@@ -333,4 +383,4 @@ function lockPointerControls(){
     }
 }
 
-export {init3D, create3DSubscriber,add3DSubscribersToScene,remove3DSubscriber,remove3DSubscribers,setObjectPosition,setCanvasSize,lockPointerControls,unlockPointerControls};
+export {init3D, create3DSubscriber,add3DSubscribersToScene,remove3DSubscriber,remove3DSubscribers,setObjectPosition,setCanvasSize,lockPointerControls,unlockPointerControls,moveSubscriberToPos};

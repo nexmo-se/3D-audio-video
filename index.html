@@ -8,7 +8,7 @@
     </section>
 	<div class="grid-container">
 	<div class="topbar">
-        <label class="mode-selector">Audio Mode: &nbsp;&nbsp;<input id="nonemode" name="audiomode" type="radio"/>  None &nbsp; &nbsp; &nbsp; &nbsp; <input id="stereomode" name="audiomode" type="radio"/>Stereo  &nbsp; &nbsp; &nbsp; &nbsp;<input id="spatialmode" name="audiomode" type="radio" checked/>Spatial </label>
+        <label class="mode-selector">Audio Mode: &nbsp;&nbsp;<input id="nonemode" name="audiomode" type="radio"/>  Mono &nbsp; &nbsp; &nbsp; &nbsp; <input id="stereomode" name="audiomode" type="radio"/>Stereo  &nbsp; &nbsp; &nbsp; &nbsp;<input id="spatialmode" name="audiomode" type="radio" checked/>Spatial </label>
 		<label class="switch"><input type="checkbox" id="togBtn"> <div class="slider round"></div> </label>
 	</div>
     <div id="3dcanvas" class="layout" style="visibility: hidden">
@@ -43,6 +43,7 @@
 </div>
 </body>
 <script src="https://static.opentok.com/v2/js/opentok.js"></script>
+<script type="text/javascript" src="node_modules/@tweenjs/tween.js/dist/tween.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/resonance-audio/build/resonance-audio.min.js"></script>
 <script type="module">
   import {mainInit} from './scripts/main.js'

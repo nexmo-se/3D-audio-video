@@ -14,6 +14,10 @@ let MODE_SPATIAL=2;
 
 var audioMode = MODE_SPATIAL;
 
+
+function resumeAudioContext(){
+    audioContext.resume();
+}
 function getAudioMode(){
     return audioMode;
 }
@@ -195,4 +199,4 @@ function findAngle(cx, cy, ex, ey) {
   //if (theta < 0) theta = 360 + theta; // range [0, 360)
   return theta;
 }
-export {initResonanceAudio,connectVideoToResonanceAudio,addMusicSource,setSourcePosition,setListenerOrientation,setListenerPosition,updateSource2DPosition,sourceExists,setAudioMode,getAudioMode,MODE_NONE,MODE_STEREO,MODE_SPATIAL,changeMode};
+export {initResonanceAudio,connectVideoToResonanceAudio,addMusicSource,setSourcePosition,setListenerOrientation,setListenerPosition,updateSource2DPosition,sourceExists,setAudioMode,getAudioMode,MODE_NONE,MODE_STEREO,MODE_SPATIAL,changeMode,resumeAudioContext};

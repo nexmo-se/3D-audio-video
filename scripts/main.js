@@ -60,6 +60,7 @@ function onWindowResize() {
 }
 
 function callBtnClicked(){
+    ResonanceX.resumeAudioContext();
     document.getElementById("callBtn").disabled = true;
     OpentokX.connectOrDisconnect(userid);
 }

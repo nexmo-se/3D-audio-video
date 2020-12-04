@@ -8,13 +8,10 @@ var subscriberVideoElems = {};
 var subscribers = {};
 var isConnected = false;
 var callback = undefined;
-/*var token = "T1==cGFydG5lcl9pZD0zODE2OTQ1MiZzaWc9ZjcxMWY3NjlkM2NmNjRjNzFhMDE5MWE3ZDZmMWZjNjNjMmZjMGY1OTpzZXNzaW9uX2lkPTFfTVg0ek9ERTJPVFExTW41LU1UWXdOVFl3TWpnd056Y3dPWDV4ZDFJd2JEaGxUMWMyVkM5MEt6aE5XamwyUm5sRUswbC1mZyZjcmVhdGVfdGltZT0xNjA1NjAyODA4Jm5vbmNlPTAuNjEwODQ5NzkwNzAzNjU2NyZyb2xlPW1vZGVyYXRvciZleHBpcmVfdGltZT0xNjA2MjA3NjA4JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
-var sessionId = "1_MX4zODE2OTQ1Mn5-MTYwNTYwMjgwNzcwOX5xd1IwbDhlT1c2VC90KzhNWjl2RnlEK0l-fg";
-var apiKey = "38169452";*/
 
-var apiKey="46183452";
-var sessionId = "2_MX40NjE4MzQ1Mn5-MTU2NDgyMzMxNDIxMX5KaVlsM1MvdmF0dU1XOFBCalM0T09Ic1Z-fg";
-var token ="T1==cGFydG5lcl9pZD00NjE4MzQ1MiZzaWc9YWE0NTQ0MzI4ZjllMzY1ZmY5YWU5ZDFmODU1ZjEyZWU0ZDI5Y2M1MjpzZXNzaW9uX2lkPTJfTVg0ME5qRTRNelExTW41LU1UVTJORGd5TXpNeE5ESXhNWDVLYVZsc00xTXZkbUYwZFUxWE9GQkNhbE0wVDA5SWMxWi1mZyZjcmVhdGVfdGltZT0xNjA2MTEyNTg3JnJvbGU9cHVibGlzaGVyJm5vbmNlPTE2MDYxMTI1ODcuMDYyNDE0NDEyMzI4MjM=";
+var apiKey="";
+var sessionId = "";
+var token ="";
 
 var STATUS_DISCONNECTED=0;
 var STATUS_CONNECTED=1;
@@ -77,13 +74,13 @@ function initializeVideoSession() {
         }, handleError);
 
         subscriber.on('videoElementCreated', function(event) {
-            subscriberVideoElems[subscriber.stream.id] = event.element;
-            subscribers[subscriber.stream.id] = subscriber;
+            subscriberVideoElems[subscriber.stream.connection.connectionId] = event.element;
+            subscribers[subscriber.stream.connection.connectionId] = subscriber;
             if(Common.is3DMode()){
-              ThreeX.create3DSubscriber(event.target.streamId,event.element);
+              ThreeX.create3DSubscriber(subscriber.stream.connection.connectionId,event.element);
             }
             else{
-              addSubcriberToDom(event.target.streamId,event.element);
+              addSubcriberToDom(subscriber.stream.connection.connectionId,event.element);
             }
         });
 
@@ -97,6 +94,14 @@ function initializeVideoSession() {
     OTSession.on('streamDestroyed', function(event) {
         removeSubscriber(event);
     });
+    
+    OTSession.on('signal:position', function(event){
+        if(event.from.connectionId != OTSession.connection.id){
+            console.log("received position: "+event.data);
+            var position = JSON.parse(event.data);
+            ThreeX.moveSubscriberToPos(event.from.connectionId,position);
+        }
+    })
 }
 
 function addSubcriberToDom(streamId,element) {
@@ -133,12 +138,12 @@ function addSubscribersToDom(){
 
 function removeSubscriber(event) {
     if(Common.is3DMode()){
-        ThreeX.remove3DSubscriber(event.stream.id);
+        ThreeX.remove3DSubscriber(event.stream.connection.connectionId);
     }
     else{
-        document.getElementById(event.stream.id).remove();
-        delete subscribers[event.stream.id];
-        delete subscriberVideoElems[event.stream.id];
+        document.getElementById(event.stream.connection.connectionId).remove();
+        delete subscribers[event.stream.connection.connectionId];
+        delete subscriberVideoElems[event.stream.connection.connectionId];
     }
 }
 
@@ -192,4 +197,15 @@ function getSubscriberElemList(){
 	return subscriberVideoElems;
 }
 
-export {initializeVideoSession,addSubscribersToDom,removeSubscribersFromDom,getSubscriberList,getSubscriberElemList,connectOrDisconnect,getStatus,STATUS_CONNECTED,STATUS_DISCONNECTED,STATUS_ERROR,setConnectionCallback,callback};
+function sendPositionUpdate(position){
+    if(isConnected){
+        console.log("Sending position update: " + JSON.stringify(position));
+        OTSession.signal({data: JSON.stringify(position), type:'position'},function(error) {
+           if(error){
+               handleError(error);
+           }             
+        });
+    }
+}
+
+export{initializeVideoSession,addSubscribersToDom,removeSubscribersFromDom,getSubscriberList,getSubscriberElemList,connectOrDisconnect,getStatus,STATUS_CONNECTED,STATUS_DISCONNECTED,STATUS_ERROR,setConnectionCallback,callback,sendPositionUpdate};

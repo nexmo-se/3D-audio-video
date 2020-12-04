@@ -1,6 +1,21 @@
 <html>
 <head>
 <style>
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+}
+
+/* Create two equal columns that sits next to each other */
+.column {
+  flex: 50%;
+  padding: 10px;
+  
+}
+    
 .button {
   display: inline-block;
   padding: 15px 25px;
@@ -26,15 +41,38 @@
 </style>
 </head>
 <body>
-    <div style="text-align: center">
-        <label style="font-size:3em"> Step 1</label><br/><br/>
+<div class="row">
+  <div class="column" style="background-color:#aaaaaa21;text-align: center">
+     <label style="font-size:3em"> Step 1</label><br/><br/>
         <button class="button" onclick="launchWindow()">Launch application</button>
         <br/><br/><br/><br/><br/>
         <label style="font-size:3em"> Step 2</label><br/><br/>
-        <label style="font-size:1.5em">Invite other participants to join you</label><br/><br/>
+        <label style="font-size:1.5em">Invite other participants to join you</label><br/>
+        <label style="font-size:1.5em">For best experience ask someone join from a different computer</label><br/><br/>
         <label style="font-size:1.5em" id="urlholder"></label>
         <br/><br/><br/>
         Works only with <u>Chrome and Firefox</u>
+  </div>
+  <div class="column" style="background-color:#aaaaaa21">
+    <!-- #######  THIS IS A COMMENT - Visible only in the source editor #########-->
+<h2>How does it work</h2>
+<p>This demo integrates Resonance Audio (from Google / opensource) and Three.JS (Opensource) with Vonage Video API to create a spatial sound and 3D video effect.</p>
+<p>Audio from different participants is connected to Resonance audio and based on the coordinates (position) of the participant the audio profile is modified. Three.JS allows us to use video elements as textures for the 3D surfaces.</p>
+<h2>How to use</h2>
+<p>1. After launching the demo, click on the green call button at the bottom to join the video session.</p>
+<p>2. Once you have joined successfully, send the demo link to a colleague or any other participant and ask them to join.</p>
+<p>3. If you join from the same PC or same room, there may be an echo and other audio issues.</p>
+<p>4. When a new participant joins, you will see their video tile appear. These video tiles are draggable. As you drag the video tile around the publisher video you can feel the audio effects.</p>
+<p>4. When in default 2D mode, you can select Stereo and Spatial audio effects.</p>
+<p>5. In 2D mode, we have provided a special music element on the UI to experiment if there are no participants except you.</p>
+<p>6. You can switch to the 3D mode by clicking the button on the top right corner. In 3D mode only spatial audio is available.</p>
+<p>7. When you switch to 3D mode, the participants will be randomly placed inside a 3D room. You can use arrow keys and mouse to navigate around the room and see the audio effect change. If you want to change the position of participants in the room, simply switch back to 2D and then 3D again, this will again place them at random positions.</p>
+<p>&nbsp;</p>
+<p>Note: In "spatial audio mode" you can drag around both subscribers and publisher. In "stereo mode", you should only drag the subscribers. moving the publisher has no effect on audio.&nbsp;</p>
+  </div>
+</div>
+    <div style="text-align: center">
+       
     </div>
 </body>
 <script>

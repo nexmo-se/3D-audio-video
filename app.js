@@ -3,8 +3,8 @@ const app = express()
 var bodyParser = require('body-parser')
 var OpenTok = require('opentok');
 
-var apikey="46183452";
-var secret="0daf8fbe7a661824fcd88a9c9c5c0016168760da";
+var apikey="";
+var secret="";
 var opentok = OpenTok(apikey,secret)
 
 var sessions = {};
