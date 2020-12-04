@@ -99,7 +99,9 @@ function initializeVideoSession() {
         if(event.from.connectionId != OTSession.connection.id){
             console.log("received position: "+event.data);
             var position = JSON.parse(event.data);
-            ThreeX.moveSubscriberToPos(event.from.connectionId,position);
+            if(Common.is3DMode()){
+                ThreeX.moveSubscriberToPos(event.from.connectionId,position);
+            }
         }
     })
 }
