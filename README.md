@@ -6,6 +6,10 @@
 * ThreeJS Web SDK
 * Tween.js 
 
+edit app.js and add your Video API credentials.
+open http://localhost:3000/index.html?u=<uid> on 2 or more machines to join the group call and experience spacial audio and 3D video.
+you can use any integer as the uid. uid is like a unique room-id.
+
 ## How does it work
 
 This demo supports 3 modes.
